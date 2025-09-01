@@ -2,13 +2,17 @@ package com.example.playgroundmetro
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.playgroundmetro.data.sampleItems
 import com.example.playgroundmetro.ui.DetailScreen
+import com.example.playgroundmetro.ui.DetailViewModel
 import com.example.playgroundmetro.ui.HomeScreen
+import com.example.playgroundmetro.ui.HomeViewModel
+import dev.zacsweers.metro.AppScope
 import dev.zacsweers.metro.DependencyGraph
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -21,12 +25,10 @@ object Home
 @Serializable
 data class Detail(val itemId: Int)
 
-@DependencyGraph
+@DependencyGraph(AppScope::class)
 interface AppGraph {
-    val message: String
-
-    @Provides
-    fun provideMessage(): String = "This is DI String with Metro"
+    val homeViewModel: HomeViewModel
+    val detailViewModel: DetailViewModel
 }
 
 @Composable
@@ -42,7 +44,7 @@ fun App() {
         ) {
             composable<Home> {
                 HomeScreen(
-                    title = appGraph.message,
+                    viewModel = appGraph.homeViewModel,
                     onItemClick = { item ->
                         navController.navigate(Detail(item.id))
                     }
@@ -55,7 +57,7 @@ fun App() {
                 
                 item?.let {
                     DetailScreen(
-                        item = it,
+                        viewModel = appGraph.detailViewModel,
                         onBackClick = {
                             navController.popBackStack()
                         }

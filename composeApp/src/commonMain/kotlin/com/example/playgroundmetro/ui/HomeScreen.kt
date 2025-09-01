@@ -14,14 +14,14 @@ import com.example.playgroundmetro.data.sampleItems
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    title: String,
+    viewModel: HomeViewModel,
     onItemClick: (ListItem) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
-            title = { Text(title) }
+            title = { Text("ホーム") }
         )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -31,7 +31,10 @@ fun HomeScreen(
             items(sampleItems) { item ->
                 ItemCard(
                     item = item,
-                    onClick = { onItemClick(item) }
+                    onClick = {
+                        viewModel.updateText(item.title)
+                        onItemClick(item)
+                    }
                 )
             }
         }
