@@ -1,47 +1,53 @@
 package com.example.playgroundmetro
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.playgroundmetro.data.ListItem
+import com.example.playgroundmetro.data.sampleItems
+import com.example.playgroundmetro.ui.DetailScreen
+import com.example.playgroundmetro.ui.HomeScreen
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-import playgroundmetro.composeapp.generated.resources.Res
-import playgroundmetro.composeapp.generated.resources.compose_multiplatform
+@Serializable
+object Home
+
+@Serializable
+data class Detail(val itemId: Int)
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        val navController = rememberNavController()
+        
+        NavHost(
+            navController = navController,
+            startDestination = Home
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            composable<Home> {
+                HomeScreen(
+                    onItemClick = { item ->
+                        navController.navigate(Detail(item.id))
+                    }
+                )
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+            
+            composable<Detail> { backStackEntry ->
+                val detail = backStackEntry.toRoute<Detail>()
+                val item = sampleItems.find { it.id == detail.itemId }
+                
+                item?.let {
+                    DetailScreen(
+                        item = it,
+                        onBackClick = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
             }
         }
