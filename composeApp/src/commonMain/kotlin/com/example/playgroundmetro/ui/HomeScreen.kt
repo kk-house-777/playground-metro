@@ -14,13 +14,14 @@ import com.example.playgroundmetro.data.sampleItems
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    title: String,
     onItemClick: (ListItem) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
-            title = { Text("ホーム") }
+            title = { Text(title) }
         )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
